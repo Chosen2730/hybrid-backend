@@ -1,6 +1,10 @@
 const User = require("../model/userSchema");
 const { StatusCodes } = require("http-status-codes");
-const { BadRequestError } = require("../errors");
+const {
+  BadRequestError,
+  NotFoundError,
+  UnauthenticatedError,
+} = require("../errors");
 
 const getAllUsers = async (req, res) => {
   const users = await User.find();
@@ -16,10 +20,30 @@ const signup = async (req, res) => {
     throw new BadRequestError("Password and Confirm password do not match");
   }
   const user = await User.create(req.body);
-  res.status(StatusCodes.OK).json(user);
+  const token = await user.createJWT();
+  res.status(StatusCodes.CREATED).json({ user, token });
 };
+
 const login = async (req, res) => {
-  res.send("User login");
+  const { password, email } = req.body;
+  if (!email || !password) {
+    throw new BadRequestError("Email and password must be provided");
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new NotFoundError("User does not exist in our database");
+  }
+
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    throw new UnauthenticatedError("Wrong Password");
+  }
+  const token = await user.createJWT();
+  res.status(StatusCodes.OK).json({
+    token,
+    user: { fullName: user.fullName, tel: user.tel, email: user.email },
+  });
 };
 
 const getSingleUser = async (req, res) => {
@@ -38,7 +62,7 @@ const deleteUser = async (req, res) => {
   const { user_id } = req.params;
   const user = await User.findOneAndDelete({ _id: user_id });
   if (!user) {
-    throw new BadRequestError("User not found");
+    throw new NotFoundError("User not found");
   }
   res.status(StatusCodes.OK).json({ msg: "User deleted" });
 };
