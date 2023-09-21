@@ -9,7 +9,7 @@ const {
 } = require("../controllers/user");
 const router = require("express").Router();
 
-router.get("/").get(getAllUsers);
+router.get("/", getAllUsers);
 router.post("/signup", signup);
 router.post("/login", login);
 router.get("/show-user", showUser);
