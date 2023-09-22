@@ -15,12 +15,13 @@ const getAllUsers = async (req, res) => {
 };
 
 const signup = async (req, res) => {
-  const { password, confirmPassword } = req.body;
+  const { password, confirmPassword, email } = req.body;
   if (password !== confirmPassword) {
     throw new BadRequestError("Password and Confirm password do not match");
   }
-  const user = await User.create(req.body);
+  const user = await User.create({ ...req.body, email: email.toLowerCase() });
   const token = await user.createJWT();
+  // console.log(user);
   res.status(StatusCodes.CREATED).json({ user, token });
 };
 
@@ -30,7 +31,7 @@ const login = async (req, res) => {
     throw new BadRequestError("Email and password must be provided");
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: email.toLowerCase() });
   if (!user) {
     throw new NotFoundError("User does not exist in our database");
   }
