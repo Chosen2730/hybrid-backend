@@ -6,11 +6,14 @@ const cors = require("cors");
 const connectDB = require("./db/connect");
 const notFound = require("./middlewares/notFoundMiddleWare");
 const errorHandler = require("./middlewares/errorHandler");
+const authorizeUser = require("./middlewares/authorization");
 const userRouter = require("./routes/user");
+const categoryRouter = require("./routes/category");
 
 app.use(cors());
 app.use(express.json());
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/category", authorizeUser, categoryRouter);
 app.get("/", (req, res) => res.send("Hello World!"));
 
 app.use(notFound);

@@ -1,7 +1,7 @@
 const { model, Schema } = require("mongoose");
 // const Task = require("./taskSchema");
 const CategorySchema = new Schema({
-  title: { type: String, required: true },
+  title: { type: String, required: [true, "Title is required"] },
   color: {
     type: String,
     required: true,
@@ -17,7 +17,7 @@ const CategorySchema = new Schema({
     ],
   },
   tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
-  createdBy: { type: Schema.ObjectId, ref: "User" },
+  createdBy: { type: Schema.ObjectId, ref: "User", required: true },
 });
 
 module.exports = model("Category", CategorySchema);
