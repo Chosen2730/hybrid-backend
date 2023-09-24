@@ -3,7 +3,9 @@ const Category = require("../model/categorySchema");
 const { StatusCodes } = require("http-status-codes");
 
 const getAllCategories = async (req, res) => {
-  const categories = await Category.find({ createdBy: req.user.user_id });
+  const categories = await Category.find({
+    createdBy: req.user.user_id,
+  }).populate("tasks");
   if (categories.length < 1) {
     return res
       .status(StatusCodes.OK)
@@ -14,7 +16,7 @@ const getAllCategories = async (req, res) => {
 
 const getCategory = async (req, res) => {
   const { id } = req.params;
-  const category = await Category.findOne({ _id: id });
+  const category = await Category.findOne({ _id: id }).populate("tasks");
   if (!category) {
     throw new NotFoundError("Category does not exist");
   }
@@ -22,10 +24,12 @@ const getCategory = async (req, res) => {
 };
 
 const createCategory = async (req, res) => {
-  const category = await Category.create({
+  const categoryData = {
     ...req.body,
     createdBy: req.user.user_id,
-  });
+  };
+
+  const category = await Category.create(categoryData);
   res.status(StatusCodes.CREATED).json(category);
 };
 
@@ -35,11 +39,10 @@ const updateCategory = async (req, res) => {
 
 const deleteCategory = async (req, res) => {
   const { id } = req.params;
-  const category = await Category.findOneAndDelete({ _id: id });
+  const category = await Category.findOneAndRemove({ _id: id });
   if (!category) {
     throw new NotFoundError("Category does not exist");
   }
-  console.log(category);
   res.status(StatusCodes.OK).json({ msg: "Category deleted successfully" });
 };
 
