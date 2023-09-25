@@ -9,11 +9,6 @@ const getAllTasks = async (req, res) => {
     createdBy: req.user.user_id,
     categoryID: id,
   });
-  if (tasks.length < 1) {
-    return res
-      .status(StatusCodes.OK)
-      .json({ msg: "No task for this category" });
-  }
   res.status(StatusCodes.OK).json(tasks);
 };
 
@@ -41,7 +36,15 @@ const createTask = async (req, res) => {
 };
 
 const updateTask = async (req, res) => {
-  res.send("update category");
+  const { id } = req.params;
+  const task = await Task.findOneAndUpdate({ _id: id }, req.body, {
+    runValidators: true,
+    new: true,
+  });
+  if (!task) {
+    throw new NotFoundError("Task does not exist");
+  }
+  res.status(StatusCodes.OK).json({ msg: "Task updated successfully" });
 };
 
 const deleteTask = async (req, res) => {

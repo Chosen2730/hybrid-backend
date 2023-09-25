@@ -6,11 +6,6 @@ const getAllCategories = async (req, res) => {
   const categories = await Category.find({
     createdBy: req.user.user_id,
   }).populate("tasks");
-  if (categories.length < 1) {
-    return res
-      .status(StatusCodes.OK)
-      .json({ msg: "You have no category created" });
-  }
   res.status(StatusCodes.OK).json(categories);
 };
 
@@ -21,6 +16,11 @@ const getCategory = async (req, res) => {
     throw new NotFoundError("Category does not exist");
   }
   res.status(StatusCodes.OK).json(category);
+};
+
+const getColors = async (req, res) => {
+  const colors = Category.schema.path("color").enumValues;
+  res.status(StatusCodes.OK).json(colors);
 };
 
 const createCategory = async (req, res) => {
@@ -52,4 +52,5 @@ module.exports = {
   createCategory,
   updateCategory,
   deleteCategory,
+  getColors,
 };

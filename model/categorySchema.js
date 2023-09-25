@@ -6,6 +6,7 @@ const CategorySchema = new Schema(
     title: {
       type: String,
       required: [true, "Title is required"],
+      unique: true,
     },
     color: {
       type: String,
