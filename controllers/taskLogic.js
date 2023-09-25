@@ -44,7 +44,7 @@ const updateTask = async (req, res) => {
   if (!task) {
     throw new NotFoundError("Task does not exist");
   }
-  res.status(StatusCodes.OK).json({ msg: "Task updated successfully" });
+  res.status(StatusCodes.OK).json({ msg: "Task updated successfully", task });
 };
 
 const deleteTask = async (req, res) => {

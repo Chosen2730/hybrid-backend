@@ -13,7 +13,7 @@ router.get("/colors", getColors);
 router
   .route("/:id")
   .get(getCategory)
-  .delete(deleteCategory)
-  .patch(updateCategory);
+  .patch(updateCategory)
+  .delete(deleteCategory);
 
 module.exports = router;
