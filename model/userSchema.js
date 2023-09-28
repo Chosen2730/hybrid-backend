@@ -3,6 +3,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const UserSchema = new Schema(
   {
+    image: {
+      url: String,
+      imageId: String,
+    },
     fullName: {
       type: String,
       required: [true, "Full name field is required"],

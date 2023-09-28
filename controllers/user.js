@@ -5,6 +5,8 @@ const {
   NotFoundError,
   UnauthenticatedError,
 } = require("../errors");
+const deleteImage = require("../middlewares/deleteImage");
+const uploadImage = require("../middlewares/imageUploader");
 
 const getAllUsers = async (req, res) => {
   const users = await User.find();
@@ -41,22 +43,76 @@ const login = async (req, res) => {
     throw new UnauthenticatedError("Wrong Password");
   }
   const token = await user.createJWT();
+
   res.status(StatusCodes.OK).json({
     token,
-    user: { fullName: user.fullName, tel: user.tel, email: user.email },
+    user: {
+      user_id: user._id,
+    },
   });
 };
 
 const getSingleUser = async (req, res) => {
-  res.send("Single user");
+  const { user_id } = req.params;
+  const user = await User.findOne({ _id: user_id });
+
+  if (!user) {
+    throw new BadRequestError(`User does not exist`);
+  }
+  const currentUser = {
+    fullName: user.fullName,
+    tel: user.tel,
+    email: user.email,
+    user_id: user._id,
+    profileImage: user.image.url,
+  };
+
+  res.status(200).json(currentUser);
 };
 
 const showUser = async (req, res) => {
-  res.send("User shown");
+  res.status(StatusCodes.OK).json(req.user);
 };
 
 const updateUser = async (req, res) => {
-  res.send("User updated");
+  const { user_id } = req.params;
+  let update = req.body;
+
+  const user = await User.findOne({ _id: user_id });
+
+  if (!user) {
+    throw new BadRequestError(`User does not exist`);
+  }
+  const {
+    image: { imageId },
+  } = user;
+
+  const newImg = req.files?.image;
+  // console.log(newImg);
+  if (newImg) {
+    if (imageId) {
+      await deleteImage(imageId);
+    }
+
+    const { public_id, secure_url } = await uploadImage(req, "user");
+    update = { ...req.body, image: { url: secure_url, imageId: public_id } };
+  }
+
+  const newUser = await User.findOneAndUpdate({ _id: user_id }, update, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    updatedUser: {
+      fullName: newUser.fullName,
+      tel: newUser.tel,
+      email: newUser.email,
+      user_id: newUser._id,
+      profileImage: newUser.image.url,
+    },
+    msg: "Profile successfully updated",
+  });
 };
 
 const deleteUser = async (req, res) => {
