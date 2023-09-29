@@ -89,7 +89,7 @@ const updateUser = async (req, res) => {
   } = user;
 
   const newImg = req.files?.image;
-  console.log(newImg);
+  // console.log(newImg);
   if (newImg) {
     if (imageId) {
       await deleteImage(imageId);
