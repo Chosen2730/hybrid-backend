@@ -63,6 +63,7 @@ const getSingleUser = async (req, res) => {
     fullName: user.fullName,
     tel: user.tel,
     email: user.email,
+    backupEmail: user.backupEmail,
     user_id: user._id,
     profileImage: user.image.url,
   };
@@ -88,7 +89,7 @@ const updateUser = async (req, res) => {
   } = user;
 
   const newImg = req.files?.image;
-  // console.log(newImg);
+  console.log(newImg);
   if (newImg) {
     if (imageId) {
       await deleteImage(imageId);

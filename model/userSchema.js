@@ -27,6 +27,14 @@ const UserSchema = new Schema(
         ["Please provide a valid email"],
       ],
     },
+    backupEmail: {
+      type: String,
+      trim: true,
+      match: [
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        ["Please provide a valid email"],
+      ],
+    },
     password: {
       type: String,
       required: [true, "Password field is required"],
